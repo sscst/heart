@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>JS心型线</title>
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Tangerine">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs
+/jquery/1.4.0/jquery.min.js"></script>
+<style>
+div{
+	position:absolute;
+}
+.xx-box{
+	left:50%;
+	top:50%;
+	margin-left:-250px;
+	margin-top:-250px;
+	width:500px;
+	height:500px;
+	background-color:#000;
+}
+.xx-box .text{
+    filter:alpha(opacity=100); /* IE */ 
+    -moz-opacity:1.0;          /* Moz + FF */
+	top:30%;
+	height:48px;
+	line-height:48px;
+	color:#f00;
+	text-shadow: 3px 3px 4px #f00;
+	font-size:36px;
+	font-weight:bold;
+	width:100%;
+	text-align:center;
+	font-family:Tangerine,Tahoma,Arial,"\65f6\5c1a\4e2d\9ed1\7b80\4f53","\5b8b\4f53";
+}
+.xx-box .item{
+    width:6px;
+	height:6px;
+	overflow:hidden;
+}
+
+.xue{
+  position:absolute;
+  color:#fff;
+  width:6px;
+  height:6px;
+}
+
+#snow {
+   filter:alpha(opacity=0); /* IE */ 
+   -moz-opacity: 0; /* Moz + FF */
+   width:500px;
+   height:500px;
+}
+</style>
+</head>
+<body>
+<div class="xx-box" id="xx-box">
+    <div id="snow"></div>
+	<div class="text" id="text">I Love You</div>
+	<div class="text" id="dratext">我 爱 你 !</div>
+</div>
+
+<script>
+    var word ,box , i = 0 ;
+    function createPoint(x,y,c){
+	    var div = document.createElement("div");
+	    div.className = "item";
+	    div.style.left = x + "px";
+	    div.style.top = y + "px";
+	    div.style.backgroundColor = c;
+	    document.getElementById("xx-box").appendChild(div);
+	    delete div ;
+    }
+    function heartShape(r,dx,dy,c,i){//r:大小;dx:水平偏移;dy:垂直偏移;c:颜色
+	   var m,n,x,y;
+	    if( i <= 360 ){
+	        n = r * ( 1 +  Math.cos(i * 180 / 3.14));
+	        y = n * Math.cos(i * 180 / 3.14) + dx;
+	        x = n * Math.sin(i * 180 / 3.14) + dy;
+	        createPoint(x,y,c);
+		    delete m,n,x,y;
+		    i += 0.5 ;
+		    setTimeout("heartShape(" + r + "," + dx + "," + dy + ",'" + c + "'," + i + ")" , 10);
+	    }
+    }
+    function flash( type ){
+        if( type == 1){
+	        document.getElementById("text").innerHTML = "" ;
+	    }
+	    else {
+	        document.getElementById('text').innerHTML = "I Love You" ;
+	    }
+	    type = (++type) % 2 ;
+	    setTimeout("flash(" + type + ")",500);
+    }
+    function add_char( letters ){
+       $("#dratext").append( word.charAt(letters) ) ;
+	   letters++ ;
+	   if( letters <= word.length - 1 ){
+	      setTimeout("add_char(" + letters + ")" , 300);
+	    }
+    }
+    function flash_one_by_one(){
+       word = $("#dratext").text();
+	   $("#dratext").text("");
+	   add_char( 0 ) ;
+    }
+	function random( base ){
+	    var x = Math.random() ;
+		if( x < 0.3 ){
+		    x = 0.3  * Math.random() ;
+		}
+		return x * base ;
+	}
+	function gogo(){
+		var a = document.createElement("div");
+		a.innerHTML = '.';
+		a.id = "xue" + i;
+		a.className = "xue";
+		a.style.top  = random( parseInt(box.height() ) ) + 'px';
+		a.style.left = random( parseInt(box.width() ) ) + 'px';
+		box.append(a);
+		godown(a.id,a.id,8*Math.random());
+		i++;
+		var x = 100 * Math.random()* Math.random();
+		delete a ;
+		setTimeout('gogo()',x);
+		delete x ;
+	};
+	function removeElement(_element){
+         var _parentElement = _element.parentNode;
+         if(_parentElement){
+                _parentElement.removeChild(_element);
+         };
+	};
+	function godown(a,e,speed){
+		if(speed < 3){speed = 3}
+		var a1 =document.getElementById(a);
+		a1.style.top = parseInt(a1.style.top) + speed +'px';
+		if(parseInt(a1.style.top) < parseInt(box.height())){
+		    e = setTimeout("godown(\""+a+"\",\""+e+"\","+speed+")",20) ;
+			delete a1 ;
+		}
+		else{
+			clearTimeout(e);
+			removeElement(a1);
+			delete a1 ;
+		}
+	};
+	function wind_run(wind){
+		var a = document.getElementById("snow").getElementsByTagName('div');
+		for(var i = 0;i<a.length;i++){
+			a[i].style.left = parseInt(a[i].style.left) + wind +'px';
+		}
+		delete a ;
+		if(Math.abs(wind) > 0.1){
+		    wind_time = setTimeout("wind_run("+wind+")",20);
+	    }else{
+		    clearTimeout(wind_time);
+			wind = 0;
+		}
+		
+	};
+	
+
+ $(document).ready(function () {
+        box = $("#snow");
+        box.click(function(){wind_run(6)});
+        $("#dratext").css("top","40%");
+        flash_one_by_one();
+		heartShape(150,80,250,"#f00",0);
+        flash(1);
+		gogo();	
+    });
+
+</script>
+</body>
+</html>
